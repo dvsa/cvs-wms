@@ -2,3 +2,4 @@
 .idea
 liquibase.properties
 mysql-connector-java-*
+.vscode/settings.json
