@@ -1,7 +1,7 @@
-SET @max_id = CAST((SELECT MAX(ID) FROM EDH_WMS_STAGING.NGT_SITE_EVENTS) AS UNSIGNED);
+SET @max_id = CAST((SELECT MAX(ID) FROM NGT_SITE_EVENTS) AS UNSIGNED);
 SET @row_number = 0; 
 SET @first_date_offset_from_today = 0;
-INSERT INTO EDH_WMS_STAGING.NGT_SITE_EVENTS
+INSERT INTO NGT_SITE_EVENTS
 (
 	ID
 	,SITE_EVENT_ID
@@ -122,4 +122,4 @@ FROM (
             ORDER BY units.seqval + tens.seqval + hundreds.seqval
 		) date_adjustments
 ) pno_rownums
-JOIN EDH_WMS_STAGING.NGT_SITE s ON pno_rownums.pno = s.C_ID
+JOIN NGT_SITE s ON pno_rownums.pno = s.C_ID
