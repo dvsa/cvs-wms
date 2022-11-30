@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset liquibase:create -multiple-tables:1 splitStatements:true endDelimiter:; context:dev
+
 CREATE TABLE IF NOT EXISTS 'ngt_site'
   (
      id                INT(11) NOT NULL,
