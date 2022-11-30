@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS ngt_site
+CREATE TABLE IF NOT EXISTS 'ngt_site'
   (
      id                INT(11) NOT NULL,
      site_id           INT(11) NOT NULL,
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS ngt_site
      KEY nst_site_ind1 (site_id),
      KEY nst_c_ind2 (c_id)
   )
-engine=innodb DEFAULT charset=latin1;
+ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS ngt_staff
+CREATE TABLE IF NOT EXISTS 'ngt_staff'
   (
      id                     INT(11) NOT NULL,
      staff_id               DECIMAL(10, 0) NOT NULL,
@@ -65,10 +65,9 @@ CREATE TABLE IF NOT EXISTS ngt_staff
      PRIMARY KEY (id),
      KEY nsf_staff_ind1 (staff_id)
   )
-engine=innodb
-DEFAULT charset=latin1;
+ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS ngt_site_events
+CREATE TABLE IF NOT EXISTS 'ngt_site_events'
   (
      id                DECIMAL(10, 0) NOT NULL,
      site_event_id     DECIMAL(10, 0) NOT NULL,
@@ -102,5 +101,4 @@ CREATE TABLE IF NOT EXISTS ngt_site_events
      KEY nse_staff_ind3 (staff_id),
      KEY nse_event_date_ind4 (event_date)
   )
-engine=innodb
-DEFAULT charset=latin1;
+  ENGINE = InnoDB;
