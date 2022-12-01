@@ -1,9 +1,9 @@
-SET @max_id = CAST((SELECT MAX(ID) FROM NGT_SITE_EVENTS) AS UNSIGNED);
+SET @max_id = CAST((SELECT IFNULL(MAX(ID),0) FROM NGT_SITE_EVENTS) AS UNSIGNED);
 SET @row_number = 0; 
 SET @first_date_offset_from_today = 0;
+
 INSERT INTO NGT_SITE_EVENTS
-(
-	ID
+(    ID
 	,SITE_EVENT_ID
 	,SITE_ID
 	,CMS_ORG_ID
@@ -93,6 +93,4 @@ FROM (
 			SELECT @first_date_offset_from_today + 4 AS date_adjuster 
 		) date_adjustments
 ) pno_rownums
-JOIN NGT_SITE s ON pno_rownums.pno = s.C_ID
-
-;
+JOIN NGT_SITE s ON pno_rownums.pno = s.C_ID;

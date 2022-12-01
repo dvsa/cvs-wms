@@ -1,6 +1,10 @@
 # Sythetic scheduling data creation
 
-This folder contains scripts to create synthetic scheduling data.  They are both very similar, only differing on how many days in the future they create data for.
+This folder contains scripts to create synthetic scheduling data.  
+
+to create a standard set of sites and staff (these have site events created for them.) use the `sql_INSERT_SITES_AND_STAFF` script.
+
+For site events there are two scripts, they are both very similar, only differing on how many days in the future they create data for.
 Data is created for test locations Z00001 through to Z00020.  A single resource is allocated at each test station.
 
 `sql_INSERT_SITEEVENTS_20ZNUMBERS.sql` - creates data for the next 5 days
@@ -30,11 +34,7 @@ and
 
 Run the scripts via
 
-`source sql_INSERT_SITEEVENTS_20ZNUMBERS.sql`
-
-or
-
-`source sql_INSERT_SITEEVENTS_20ZNUMBERS_6MONTHS.sql`
+`source script_file_goes_here`
 
 The scripts do not commit - you can do this via the command line via
 
