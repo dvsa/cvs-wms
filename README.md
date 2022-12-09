@@ -13,10 +13,10 @@ installed MySQL Connector/J (https://dev.mysql.com/doc/connectors/en/connector-j
 
 ```properties
 driver: com.mysql.cj.jdbc.Driver
-url: jdbc:mysql://localhost:3306/CVSBNOP?createDatabaseIfNotExist=true
+url: jdbc:mysql://localhost:3306/EDH_WMS_STAGING?createDatabaseIfNotExist=true
 username: root
 password: password
-classpath: mysql-connector-java-8.0.23.jar
+classpath: <full path to jar here>
 ```
 
 ### Once database is up and running (database user needs to have privileges in order to create database objects)
@@ -25,7 +25,7 @@ Run: `liquibase --defaultsFile liquibase.properties --changeLogFile changelog-ma
 
 Running without configuration file (provide missing paths / user credentials):
 
-`liquibase --url=jdbc:mysql://localhost:3306/CVSB19155?createDatabaseIfNotExist=true --driver=com.mysql.cj.jdbc.Driver --classpath=mysql-connector-java-8.0.23.jar --username=root --password=password --changeLogFile changelog-master.xml update`
+`liquibase --url=jdbc:mysql://localhost:3306/EDH_WMS_STAGING?createDatabaseIfNotExist=true --driver=com.mysql.cj.jdbc.Driver --classpath=<full path to jar here> --username=root --password=password --changeLogFile changelog-master.xml update`
 
 Quick step to instantiate database in Docker:
 
