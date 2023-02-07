@@ -6,7 +6,7 @@
 
     This version of the view does not hardcode the schema to use
 */
-CREATE OR REPLACE VIEW aa_daily_booking_alterations AS
+CREATE OR REPLACE VIEW daily_booking_alterations AS
 SELECT
     s.C_ID,
     st.STAFF_ID,
