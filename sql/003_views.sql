@@ -1,6 +1,8 @@
 /*
     This view retrieves all the latest events for a booking (DELETED: 0) where a VSA has been allocated
     or the ATF has cancelled the event for billing purposes.
+
+    This version of the view does not hardcode the schema to use
 */
 CREATE OR REPLACE VIEW daily_booking_alterations AS
 SELECT
