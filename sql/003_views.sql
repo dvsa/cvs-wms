@@ -1,6 +1,10 @@
+--liquibase formatted sql
+--changeset liquibase:create -multiple-tables:1 splitStatements:true endDelimiter:; runOnChange:true
 /*
     This view retrieves all the latest events for a booking (DELETED: 0) where a VSA has been allocated
     or the ATF has cancelled the event for billing purposes.
+
+    This version of the view does not hardcode the schema to use
 */
 CREATE OR REPLACE VIEW daily_booking_alterations AS
 SELECT
@@ -10,10 +14,10 @@ SELECT
     se.EVENT_DATE,
     se.EVENT_START,
     se.EVENT_END
-FROM EDH_WMS_STAGING.NGT_SITE_EVENTS se
-JOIN EDH_WMS_STAGING.NGT_SITE s
+FROM NGT_SITE_EVENTS se
+JOIN NGT_SITE s
     ON se.SITE_ID = s.SITE_ID
-JOIN EDH_WMS_STAGING.NGT_STAFF st
+JOIN NGT_STAFF st
     ON se.STAFF_ID = st.STAFF_ID
 WHERE (
     (se.STATUS = 'ALLOCATED')
