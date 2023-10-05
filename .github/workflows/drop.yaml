@@ -1,0 +1,138 @@
+name: ⛔️ Drop WMS
+run-name: "Drop - ${{ inputs.branch }}"
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        required: true
+        description: The name of the schema to drop (cvs-1234)
+      env:
+        type: environment
+        required: true
+        default: feature
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  start-runner:
+      name: 🎬 Start EC2
+      runs-on: ubuntu-latest
+      outputs:
+        label: ${{ steps.start-ec2-runner.outputs.label }}
+        ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      steps:
+        - uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: ${{ secrets.CVS_AWS_MGMT_ROLE }}
+            aws-region: eu-west-1
+            role-session-name: MGMTGHA
+        - uses: aws-actions/aws-secretsmanager-get-secrets@v1
+          with:
+            secret-ids: cvs-wms/env
+            parse-json-secrets: true
+
+        - name: Start EC2 Runner
+          id: start-ec2-runner
+          uses: dvsa/ec2-gha-runner@initial
+          with:
+            mode: start
+            github-token: ${{ env.CVS_WMS_ENV_GH_TOKEN }}
+            ec2-image-id: ${{ env.CVS_WMS_ENV_AWS_EC2_AMI }}
+            ec2-instance-type: ${{ env.CVS_WMS_ENV_AWS_EC2_SIZE }}
+            subnet-id: ${{ env.CVS_WMS_ENV_AWS_SUBNET_ID }}
+            security-group-id: ${{ env.CVS_WMS_ENV_AWS__SECURITY_GROUP }}
+            iam-role-name: ${{ env.CVS_WMS_ENV_AWS_EC2_PROFILE }}
+            aws-resource-tags: >
+              [
+                {"Key": "Name", "Value": "cvs-wms-drop/${{ inputs.branch }}"},
+                {"Key": "GitHubRepository", "Value": "${{ github.repository }}"},
+                {"Key": "StartedBy", "Value": "${{ github.actor }}"},
+                {"Key": "RunID", "Value": "${{ github.run_id }}"}
+              ]
+
+  drop-wms:
+      needs: [start-runner]
+      name: ⛔️ Drop Schema
+      runs-on: ${{ needs.start-runner.outputs.label }}
+      env:
+        AWS_DEFAULT_REGION: ${{ secrets.DVSA_AWS_REGION }}
+      steps:      
+        - name: 🤫 Set Secrets
+          uses: aws-actions/aws-secretsmanager-get-secrets@v1
+          with:
+            secret-ids: cvs-wms/env
+            parse-json-secrets: true
+          
+        - name: 🛠️ Install MySQL
+          id: install_mysql
+          run: |
+            rpm -Uvh ${{env.CVS_WMS_ENV_LIX_RPM_LINK}} \
+            && yum -y install mysql \
+            && yum -y install jq
+
+        - name: 🫳 Run Drop Schema (Multiple)
+          id: drop_multiple_schema
+          if: ${{ contains(inputs.branch, '[') }}
+          continue-on-error: true
+          run: |
+            aws secretsmanager get-secret-value \
+            --secret-id ${{ inputs.env }}/${{ env.CVS_WMS_ENV_AWS_SECRET_CONFIG }} \
+            --query SecretString --region=${{ secrets.DVSA_AWS_REGION }} --output text > my.cnf
+
+            envs=($(echo '${{inputs.branch}}' | jq -r '.[]'))
+            
+            for value in "${envs[@]}"; do
+              value="${value//-}"
+              mysql --defaults-file=my.cnf -e "${{ env.CVS_WMS_ENV_WMS_SQL_CMD }}${value^^};"
+            done
+
+        - name: 🫳 Run Drop Schema (Single)
+          id: drop_single_schema
+          if: ${{ !contains(inputs.branch, '[') }}
+          continue-on-error: true
+          env:
+            BRANCH: ${{ inputs.branch }}
+          run: |
+            aws secretsmanager get-secret-value \
+            --secret-id ${{ inputs.env }}/${{ env.CVS_WMS_ENV_AWS_SECRET_CONFIG }} \
+            --query SecretString --region=${{ secrets.DVSA_AWS_REGION }} --output text > my.cnf
+
+            BRANCH="${BRANCH//-}"
+            mysql --defaults-file=my.cnf -e "${{ env.CVS_WMS_ENV_WMS_SQL_CMD}}${BRANCH^^};"
+
+        - name: 🔔 Send MS Teams Notification
+          uses: skitionek/notify-microsoft-teams@v1.0.4
+          with:
+            webhook_url: ${{ env.CVS_WMS_ENV_MS_TEAMS_WEBHOOK }}
+            job: ${{ toJson(job) }}
+            needs: ${{ toJson(needs) }}
+            steps: ${{ toJson(steps) }}
+            overwrite: "{title: `${{github.repository}} | ${{github.workflow}} | BY: ${{github.actor}}`}"
+
+  stop-runner:
+    name: 💀 Kill EC2
+    needs: [start-runner, drop-wms]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CVS_AWS_MGMT_ROLE }}
+          aws-region: ${{ secrets.DVSA_AWS_REGION }}
+          role-session-name: MGMTGHA
+
+      - uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: cvs-tf/env
+          parse-json-secrets: true
+
+      - name: Stop EC2 runner
+        uses: dvsa/ec2-gha-runner@initial
+        with:
+          mode: stop
+          github-token: ${{ env.CVS_WMS_ENV_GH_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
