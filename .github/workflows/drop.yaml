@@ -27,8 +27,9 @@ jobs:
         - uses: aws-actions/configure-aws-credentials@v4
           with:
             role-to-assume: ${{ secrets.CVS_AWS_MGMT_ROLE }}
-            aws-region: eu-west-1
+            aws-region: ${{ secrets.DVSA_AWS_REGION }}
             role-session-name: MGMTGHA
+
         - uses: aws-actions/aws-secretsmanager-get-secrets@v1
           with:
             secret-ids: cvs-wms/env
