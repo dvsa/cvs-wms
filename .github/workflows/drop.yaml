@@ -1,4 +1,4 @@
-name: ⛔️ Drop WMS
+name: ⛔️ Drop WMS Schema
 run-name: "Drop - ${{ inputs.branch }}"
 on:
   workflow_dispatch:
@@ -49,6 +49,7 @@ jobs:
             aws-resource-tags: >
               [
                 {"Key": "Name", "Value": "cvs-wms-drop/${{ inputs.branch }}"},
+                {"Key": "Envrionment", "Value": "${{ inputs.env }}"},
                 {"Key": "GitHubRepository", "Value": "${{ github.repository }}"},
                 {"Key": "StartedBy", "Value": "${{ github.actor }}"},
                 {"Key": "RunID", "Value": "${{ github.run_id }}"}
