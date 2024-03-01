@@ -1,0 +1,10 @@
+{
+  "name": "cvs-wms",
+  "description": "",
+  "team": "",
+  "documentation": "",
+  "language": "null",
+  "terraform": false,
+  "monorepo": false,
+  "dynamo_tables": []
+}
