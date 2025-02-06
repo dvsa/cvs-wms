@@ -1,5 +1,5 @@
 .DS_Store
 .idea
 liquibase.properties
-mysql-connector-java-*
+mysql-connector-j*
 .vscode/settings.json
