@@ -24,13 +24,13 @@ jobs:
         label: ${{ steps.start-ec2-runner.outputs.label }}
         ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
       steps:
-        - uses: aws-actions/configure-aws-credentials@v4
+        - uses: aws-actions/configure-aws-credentials@v6
           with:
             role-to-assume: ${{ secrets.CVS_AWS_MGMT_ROLE }}
             aws-region: ${{ secrets.DVSA_AWS_REGION }}
             role-session-name: MGMTGHA
 
-        - uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        - uses: aws-actions/aws-secretsmanager-get-secrets@v3
           with:
             secret-ids: cvs-wms/env
             parse-json-secrets: true
@@ -63,7 +63,7 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.DVSA_AWS_REGION }}
       steps:      
         - name: 🤫 Set Secrets
-          uses: aws-actions/aws-secretsmanager-get-secrets@v1
+          uses: aws-actions/aws-secretsmanager-get-secrets@v3
           with:
             secret-ids: cvs-wms/env
             parse-json-secrets: true
@@ -106,7 +106,7 @@ jobs:
             mysql --defaults-file=my.cnf -e "${{ env.CVS_WMS_ENV_WMS_SQL_CMD}}${BRANCH^^};"
 
         - name: 🔔 Send MS Teams Notification
-          uses: skitionek/notify-microsoft-teams@v1.0.4
+          uses: skitionek/notify-microsoft-teams@v1
           with:
             webhook_url: ${{ env.CVS_WMS_ENV_MS_TEAMS_WEBHOOK }}
             job: ${{ toJson(job) }}
@@ -120,13 +120,13 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.CVS_AWS_MGMT_ROLE }}
           aws-region: ${{ secrets.DVSA_AWS_REGION }}
           role-session-name: MGMTGHA
 
-      - uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      - uses: aws-actions/aws-secretsmanager-get-secrets@v3
         with:
           secret-ids: cvs-tf/env
           parse-json-secrets: true
